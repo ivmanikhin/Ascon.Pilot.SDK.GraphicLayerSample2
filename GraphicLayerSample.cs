@@ -61,6 +61,8 @@ namespace Ascon.Pilot.SDK.GraphicLayerSample
     [Export(typeof(IMenu<MainViewContext>))]
     public class GraphicLayerSample : IMenu<MainViewContext>, IHandle<UnloadedEventArgs>, IObserver<INotification>
     {
+        //variable for decimal separator
+        private readonly string dec_separator = CultureInfo.CurrentCulture.NumberFormat.NumberDecimalSeparator; 
         private const string ServiceGraphicLayerMenu = "ServiceGraphicLayerMenu";
         private readonly IObjectModifier _modifier;
         private readonly IObjectsRepository _repository;
@@ -152,13 +154,14 @@ namespace Ascon.Pilot.SDK.GraphicLayerSample
             _scaleXY = 1;
             try
             {
-                var tmp = Properties.Settings.Default.Scale.Split(',', '.');
-                double whole;
-                double.TryParse(tmp[0], out whole);
-                double fraction = 0;
-                if (tmp.Length > 1)
-                    double.TryParse("0" + CultureInfo.CurrentCulture.NumberFormat.CurrencyDecimalSeparator + tmp[1], out fraction);
-                _scaleXY = whole + fraction;
+                double.TryParse(Properties.Settings.Default.Scale.Replace(".", dec_separator).Replace(",", dec_separator), out _scaleXY);
+              //  var tmp = Properties.Settings.Default.Scale.Split(',', '.');
+              //  double whole;
+              //  double.TryParse(tmp[0], out whole);
+              //  double fraction = 0;
+              //  if (tmp.Length > 1)
+              //      double.TryParse("0" + CultureInfo.CurrentCulture.NumberFormat.CurrencyDecimalSeparator + tmp[1], out fraction);
+              //  _scaleXY = whole + fraction;
             }
             catch (Exception) { }
 
