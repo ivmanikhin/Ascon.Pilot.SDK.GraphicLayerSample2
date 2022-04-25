@@ -9,18 +9,22 @@ using System.Windows.Interop;
 using System.Xaml;
 using System.Windows.Media;
 using System.Xml.Serialization;
+using Ascon.Pilot.SDK.XpsViewerSample;
 using Ascon.Pilot.SDK.Menu;
 using Ascon.Pilot.SDK.CreateObjectSample;
 using Ascon.Pilot.Theme.ColorScheme;
 using Color = System.Windows.Media.Color;
 using Point = System.Windows.Point;
 using System.Threading.Tasks;
+using Ascon.Pilot.SDK.GraphicLayerSample;
+
 
 namespace Ascon.Pilot.SDK.CreateObjectSample
 {
     public class ObjectLoader : IObserver<IDataObject>
     {
         private readonly IObjectsRepository _repository;
+   //     private IDataObject _dataObject;
         private IDisposable _subscription;
         private TaskCompletionSource<IDataObject> _tcs;
         private long _changesetId;
@@ -29,6 +33,8 @@ namespace Ascon.Pilot.SDK.CreateObjectSample
         {
             _repository = repository;
         }
+
+
 
         public Task<IDataObject> Load(Guid id, long changesetId = 0)
         {
@@ -56,8 +62,12 @@ namespace Ascon.Pilot.SDK.CreateObjectSample
 }
 
 
+
+
+
 namespace Ascon.Pilot.SDK.GraphicLayerSample
 {
+
     [Export(typeof(IMenu<MainViewContext>))]
     public class GraphicLayerSample : IMenu<MainViewContext>, IHandle<UnloadedEventArgs>, IObserver<INotification>
     {
@@ -68,7 +78,7 @@ namespace Ascon.Pilot.SDK.GraphicLayerSample
         private const string MoveSignatureMenu = "MoveSignatureMenu";
         private readonly IObjectModifier _modifier;
         private readonly IObjectsRepository _repository;
-        // adding xpsViever to get current page number
+        // adding xpsViewer to get current page number
         private readonly IXpsViewer _xpsViewer;
         private IPerson _currentPerson;
         private GraphicLayerElementSettingsView _settingsView;
@@ -91,7 +101,7 @@ namespace Ascon.Pilot.SDK.GraphicLayerSample
         public static extern IntPtr GetForegroundWindow();
 
         [ImportingConstructor]
-        public GraphicLayerSample(IEventAggregator eventAggregator, IObjectModifier modifier, IObjectsRepository repository, IPilotDialogService dialogService, IXpsViewer xpsViewer, XpsRenderContext context)
+        public GraphicLayerSample(IEventAggregator eventAggregator, IObjectModifier modifier, IObjectsRepository repository, IPilotDialogService dialogService, IXpsViewer xpsViewer/*, XpsRenderContext context*/)
         {
             var convertFromString = ColorConverter.ConvertFromString(dialogService.AccentColor);
             if (convertFromString != null)
@@ -102,7 +112,7 @@ namespace Ascon.Pilot.SDK.GraphicLayerSample
             eventAggregator.Subscribe(this);
             _modifier = modifier;
             _repository = repository;
-            _context = context;
+        //    _context = context;
             // making xpsViewer
             _xpsViewer = xpsViewer;
             var signatureNotifier = repository.SubscribeNotification(NotificationKind.ObjectSignatureChanged);
@@ -112,14 +122,7 @@ namespace Ascon.Pilot.SDK.GraphicLayerSample
             CheckSettings();
         }
 
-    //    [ImportingConstructor]
-    //    public XpsViewer(IXpsViewer xpsViewer)
-    //    {
-    //        var _xpsViewer = xpsViewer;
-    //    }
-            
-
-
+          
 
         // adding menu item
         public void Build(IMenuBuilder builder, MainViewContext context)
@@ -131,9 +134,6 @@ namespace Ascon.Pilot.SDK.GraphicLayerSample
             builder.GetItem(menuItem).AddItem(MoveSignatureMenu, 1).WithHeader(GraphicLayerSample2.Properties.Resources.txtMoveSignatureMenu);
         }
         
-
-        // TODO 1: Add menu item for signature replacement
-
 
 
         // open dialog on menu item click
@@ -170,7 +170,7 @@ namespace Ascon.Pilot.SDK.GraphicLayerSample
 
             else if (itemName == MoveSignatureMenu)
             {
-                AddGraphicLayer(_context.DataObject);
+ //              AddGraphicLayer();
             }
 
             else
@@ -211,9 +211,8 @@ namespace Ascon.Pilot.SDK.GraphicLayerSample
             // fixed zero pagenumber
             bool success = int.TryParse(Properties.Settings.Default.PageNumber, out _pageNumber);
             if (success == false)
-            {
                 _pageNumber = 1;
-            }
+
             Enum.TryParse(Properties.Settings.Default.VerticalAligment, out _verticalAlignment);
             Enum.TryParse(Properties.Settings.Default.HorizontalAligment, out _horizontalAlignment);
         }
@@ -246,7 +245,7 @@ namespace Ascon.Pilot.SDK.GraphicLayerSample
                 var imageStream = new MemoryStream(byteArray);
                 var scale = new Point(_scaleXY, _scaleXY);
 
-
+                //sign current page
                 var _pageNumber = _xpsViewer.CurrentPageNumber + 1;
 
 
@@ -322,7 +321,7 @@ namespace Ascon.Pilot.SDK.GraphicLayerSample
             }
         }
 
-        private void AddGraphicLayer(IDataObject dataObject)
+        public static void AddGraphicLayer(IDataObject dataObject)
         {
             //удаление старых подписей, если есть
             foreach (var file in dataObject.Files) //новое
@@ -375,5 +374,42 @@ namespace Ascon.Pilot.SDK.GraphicLayerSample
         }*/
         public void OnError(Exception error) { }
         public void OnCompleted() { }
+    }
+}
+
+
+namespace Ascon.Pilot.SDK.XpsViewerSample
+{
+    [Export(typeof(IMenu<XpsRenderClickPointContext>))]
+    public class XpsRenderContextMenuSample : IMenu<XpsRenderClickPointContext>
+    {
+        private readonly IObjectModifier _modifier;
+        private readonly IPerson _currentPerson;
+        private const string MoveSignatureMenu = "MoveSignatureMenu";
+
+        [ImportingConstructor]
+        public XpsRenderContextMenuSample(IObjectModifier modifier, IObjectsRepository repository)
+        {
+            _modifier = modifier;
+            _currentPerson = repository.GetCurrentPerson();
+        }
+
+        public void Build(IMenuBuilder builder, XpsRenderClickPointContext context)
+        {
+            var items = builder.ItemNames.ToList();
+            var position = items.Contains("miAddGraphicsLine") ? items.IndexOf("miAddGraphicsLine") : items.Count;
+            builder.AddItem(MoveSignatureMenu, position + 1)
+                   .WithHeader(GraphicLayerSample2.Properties.Resources.txtMoveSignatureMenu)
+                   .WithIsEnabled(context.SelectedVersion == context.DataObject.ActualFileSnapshot.Created);
+        }
+
+        public void OnMenuItemClick(string name, XpsRenderClickPointContext context)
+        {
+            if (name == MoveSignatureMenu)
+            {
+                Ascon.Pilot.SDK.GraphicLayerSample.GraphicLayerSample.AddGraphicLayer(context.DataObject);
+            }
+        }
+
     }
 }

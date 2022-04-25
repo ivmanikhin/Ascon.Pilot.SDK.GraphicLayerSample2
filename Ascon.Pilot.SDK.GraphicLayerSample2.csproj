@@ -14,7 +14,7 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>C:\Users\ivman\AppData\Local\ASCON\Pilot-ICE Enterprise\Development\GraphicLayerSample2\</OutputPath>
+    <OutputPath>C:\Users\manikhin_i\AppData\Local\ASCON\Pilot-ICE Enterprise\Development\GraphicLayerSample\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>

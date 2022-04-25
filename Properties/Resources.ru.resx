@@ -166,7 +166,7 @@
     <value>Настройка графического слоя</value>
   </data>
   <data name="txtMenuItem" xml:space="preserve">
-    <value>Настройка графического слоя</value>
+    <value>Настройка графического слоя (test)</value>
   </data>
   <data name="txtMoveSignatureMenu" xml:space="preserve">
     <value>Перенести подпись на другой лист</value>

@@ -45,3 +45,22 @@ C:\Users\ivman\AppData\Local\ASCON\Pilot-ICE Enterprise\Development\GraphicLayer
 C:\Users\ivman\AppData\Local\ASCON\Pilot-ICE Enterprise\Development\GraphicLayerSample2\Ascon.Pilot.SDK.GraphicLayerSample2.ext2.dll
 C:\Users\ivman\AppData\Local\ASCON\Pilot-ICE Enterprise\Development\GraphicLayerSample2\Ascon.Pilot.SDK.GraphicLayerSample2.ext2.pdb
 C:\Users\ivman\AppData\Local\ASCON\Pilot-ICE Enterprise\Development\GraphicLayerSample2\ru\Ascon.Pilot.SDK.GraphicLayerSample2.ext2.resources.dll
+C:\Users\manikhin_i\AppData\Local\ASCON\Pilot-ICE Enterprise\Development\GraphicLayerSample\Ascon.Pilot.SDK.GraphicLayerSample2.ext2.dll.config
+C:\Users\manikhin_i\AppData\Local\ASCON\Pilot-ICE Enterprise\Development\GraphicLayerSample\Ascon.Pilot.SDK.GraphicLayerSample2.ext2.dll
+C:\Users\manikhin_i\AppData\Local\ASCON\Pilot-ICE Enterprise\Development\GraphicLayerSample\Ascon.Pilot.SDK.GraphicLayerSample2.ext2.pdb
+C:\Users\manikhin_i\AppData\Local\ASCON\Pilot-ICE Enterprise\Development\GraphicLayerSample\ru\Ascon.Pilot.SDK.GraphicLayerSample2.ext2.resources.dll
+F:\VisualStudioProjects\repos\Ascon.Pilot.SDK.GraphicLayerSample2\obj\Debug\Ascon.Pilot.SDK.GraphicLayerSample2.csproj.AssemblyReference.cache
+F:\VisualStudioProjects\repos\Ascon.Pilot.SDK.GraphicLayerSample2\obj\Debug\Resources.baml
+F:\VisualStudioProjects\repos\Ascon.Pilot.SDK.GraphicLayerSample2\obj\Debug\GraphicLayerElementSettingsView.g.cs
+F:\VisualStudioProjects\repos\Ascon.Pilot.SDK.GraphicLayerSample2\obj\Debug\Ascon.Pilot.SDK.GraphicLayerSample2.ext2_MarkupCompile.cache
+F:\VisualStudioProjects\repos\Ascon.Pilot.SDK.GraphicLayerSample2\obj\Debug\Ascon.Pilot.SDK.GraphicLayerSample2.ext2_MarkupCompile.lref
+F:\VisualStudioProjects\repos\Ascon.Pilot.SDK.GraphicLayerSample2\obj\Debug\GraphicLayerElementSettingsView.baml
+F:\VisualStudioProjects\repos\Ascon.Pilot.SDK.GraphicLayerSample2\obj\Debug\Ascon.Pilot.SDK.GraphicLayerSample2.ext2.g.resources
+F:\VisualStudioProjects\repos\Ascon.Pilot.SDK.GraphicLayerSample2\obj\Debug\Ascon.Pilot.SDK.GraphicLayerSample2.Properties.Resources.resources
+F:\VisualStudioProjects\repos\Ascon.Pilot.SDK.GraphicLayerSample2\obj\Debug\Ascon.Pilot.SDK.GraphicLayerSample2.Properties.Resources.ru.resources
+F:\VisualStudioProjects\repos\Ascon.Pilot.SDK.GraphicLayerSample2\obj\Debug\Ascon.Pilot.SDK.GraphicLayerSample2.csproj.GenerateResource.cache
+F:\VisualStudioProjects\repos\Ascon.Pilot.SDK.GraphicLayerSample2\obj\Debug\Ascon.Pilot.SDK.GraphicLayerSample2.csproj.CoreCompileInputs.cache
+F:\VisualStudioProjects\repos\Ascon.Pilot.SDK.GraphicLayerSample2\obj\Debug\ru\Ascon.Pilot.SDK.GraphicLayerSample2.ext2.resources.dll
+F:\VisualStudioProjects\repos\Ascon.Pilot.SDK.GraphicLayerSample2\obj\Debug\Ascon.Pilot.SDK.GraphicLayerSample2.csproj.CopyComplete
+F:\VisualStudioProjects\repos\Ascon.Pilot.SDK.GraphicLayerSample2\obj\Debug\Ascon.Pilot.SDK.GraphicLayerSample2.ext2.dll
+F:\VisualStudioProjects\repos\Ascon.Pilot.SDK.GraphicLayerSample2\obj\Debug\Ascon.Pilot.SDK.GraphicLayerSample2.ext2.pdb

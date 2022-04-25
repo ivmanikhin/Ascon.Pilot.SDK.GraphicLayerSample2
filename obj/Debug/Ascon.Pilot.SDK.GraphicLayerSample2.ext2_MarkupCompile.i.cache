@@ -4,7 +4,7 @@
 library
 C#
 .cs
-D:\VisualStudioProjects\repos\Ascon.Pilot.SDK.GraphicLayerSample2\obj\Debug\
+F:\VisualStudioProjects\repos\Ascon.Pilot.SDK.GraphicLayerSample2\obj\Debug\
 Ascon.Pilot.SDK.GraphicLayerSample2
 none
 false
@@ -13,8 +13,8 @@ DEBUG;TRACE
 21872638224
 2-1514493501
 15453044510
-17200334905
+171987867133
 GraphicLayerElementSettingsView.xaml;Resources.xaml;
 
-False
+True
 
