@@ -41,3 +41,7 @@ D:\VisualStudioProjects\repos\Ascon.Pilot.SDK.GraphicLayerSample2\obj\Debug\ru\A
 D:\VisualStudioProjects\repos\Ascon.Pilot.SDK.GraphicLayerSample2\obj\Debug\Ascon.Pilot.SDK.GraphicLayerSample2.csproj.CopyComplete
 D:\VisualStudioProjects\repos\Ascon.Pilot.SDK.GraphicLayerSample2\obj\Debug\Ascon.Pilot.SDK.GraphicLayerSample2.ext2.dll
 D:\VisualStudioProjects\repos\Ascon.Pilot.SDK.GraphicLayerSample2\obj\Debug\Ascon.Pilot.SDK.GraphicLayerSample2.ext2.pdb
+C:\Users\ivman\AppData\Local\ASCON\Pilot-ICE Enterprise\Development\GraphicLayerSample2\Ascon.Pilot.SDK.GraphicLayerSample2.ext2.dll.config
+C:\Users\ivman\AppData\Local\ASCON\Pilot-ICE Enterprise\Development\GraphicLayerSample2\Ascon.Pilot.SDK.GraphicLayerSample2.ext2.dll
+C:\Users\ivman\AppData\Local\ASCON\Pilot-ICE Enterprise\Development\GraphicLayerSample2\Ascon.Pilot.SDK.GraphicLayerSample2.ext2.pdb
+C:\Users\ivman\AppData\Local\ASCON\Pilot-ICE Enterprise\Development\GraphicLayerSample2\ru\Ascon.Pilot.SDK.GraphicLayerSample2.ext2.resources.dll

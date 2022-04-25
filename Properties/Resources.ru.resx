@@ -168,4 +168,7 @@
   <data name="txtMenuItem" xml:space="preserve">
     <value>Настройка графического слоя</value>
   </data>
+  <data name="txtMoveSignatureMenu" xml:space="preserve">
+    <value>Перенести подпись на другой лист</value>
+  </data>
 </root>

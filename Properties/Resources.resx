@@ -168,4 +168,7 @@
   <data name="PageNumber" xml:space="preserve">
     <value>Page Number</value>
   </data>
+  <data name="txtMoveSignatureMenu" xml:space="preserve">
+    <value>Move signature to another sheet</value>
+  </data>
 </root>

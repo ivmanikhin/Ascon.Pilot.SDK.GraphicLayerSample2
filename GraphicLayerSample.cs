@@ -64,9 +64,12 @@ namespace Ascon.Pilot.SDK.GraphicLayerSample
         //variable for decimal separator
         private readonly string dec_separator = CultureInfo.CurrentCulture.NumberFormat.NumberDecimalSeparator; 
         private const string ServiceGraphicLayerMenu = "ServiceGraphicLayerMenu";
+        // adding MoveSignatureMenu name
+        private const string MoveSignatureMenu = "MoveSignatureMenu";
         private readonly IObjectModifier _modifier;
         private readonly IObjectsRepository _repository;
-
+        // adding xpsViever to get current page number
+        private readonly IXpsViewer _xpsViewer;
         private IPerson _currentPerson;
         private GraphicLayerElementSettingsView _settingsView;
         private GraphicLayerElementSettingsModel _model;
@@ -81,12 +84,14 @@ namespace Ascon.Pilot.SDK.GraphicLayerSample
         //чтобы можно было на разные страницы ставить
         private int _pageNumber; 
         private bool _includeStamp;
+        private XpsRenderContext _context;
+
 
         [DllImport("user32.dll")]
         public static extern IntPtr GetForegroundWindow();
 
         [ImportingConstructor]
-        public GraphicLayerSample(IEventAggregator eventAggregator, IObjectModifier modifier, IObjectsRepository repository, IPilotDialogService dialogService)
+        public GraphicLayerSample(IEventAggregator eventAggregator, IObjectModifier modifier, IObjectsRepository repository, IPilotDialogService dialogService, IXpsViewer xpsViewer, XpsRenderContext context)
         {
             var convertFromString = ColorConverter.ConvertFromString(dialogService.AccentColor);
             if (convertFromString != null)
@@ -97,6 +102,9 @@ namespace Ascon.Pilot.SDK.GraphicLayerSample
             eventAggregator.Subscribe(this);
             _modifier = modifier;
             _repository = repository;
+            _context = context;
+            // making xpsViewer
+            _xpsViewer = xpsViewer;
             var signatureNotifier = repository.SubscribeNotification(NotificationKind.ObjectSignatureChanged);
             var fileNotifier = repository.SubscribeNotification(NotificationKind.ObjectFileChanged);
             signatureNotifier.Subscribe(this);
@@ -104,39 +112,71 @@ namespace Ascon.Pilot.SDK.GraphicLayerSample
             CheckSettings();
         }
 
+    //    [ImportingConstructor]
+    //    public XpsViewer(IXpsViewer xpsViewer)
+    //    {
+    //        var _xpsViewer = xpsViewer;
+    //    }
+            
+
+
+
+        // adding menu item
         public void Build(IMenuBuilder builder, MainViewContext context)
         {
+            // adding menu item 
             var menuItem = builder.ItemNames.First();
             builder.GetItem(menuItem).AddItem(ServiceGraphicLayerMenu, 0).WithHeader(GraphicLayerSample2.Properties.Resources.txtMenuItem);
+            // adding item for moving signature
+            builder.GetItem(menuItem).AddItem(MoveSignatureMenu, 1).WithHeader(GraphicLayerSample2.Properties.Resources.txtMoveSignatureMenu);
         }
+        
 
+        // TODO 1: Add menu item for signature replacement
+
+
+
+        // open dialog on menu item click
         public void OnMenuItemClick(string itemName, MainViewContext context)
         {
-            var x = _xOffset.ToString(CultureInfo.InvariantCulture);
-            var y = _yOffset.ToString(CultureInfo.InvariantCulture);
-            var scale = _scaleXY.ToString(CultureInfo.InvariantCulture);
-            var angle = _angle.ToString(CultureInfo.InvariantCulture);
-            //см выше(PageNumber)
-            var pageNumber = _pageNumber.ToString(CultureInfo.InvariantCulture);
-            var includeStamp = _includeStamp;
-
-            _model = new GraphicLayerElementSettingsModel(_filePath, x, y, scale, angle, _verticalAlignment, _horizontalAlignment, includeStamp, pageNumber);
-            _model.OnSaveSettings += ReloadSettings;
-
-            if (itemName != ServiceGraphicLayerMenu)
-                return;
-
-            _settingsView = new GraphicLayerElementSettingsView { DataContext = _model };
-            //не было(возможно ASCON сам убрал в следующей версии)
-            _settingsView.Unloaded += SettingsViewOnUnloaded; 
-
-            var activeWindowHandle = GetForegroundWindow();
-            new WindowInteropHelper(_settingsView)
+            if (itemName == ServiceGraphicLayerMenu)
             {
-                Owner = activeWindowHandle
-            };
-            _settingsView.ShowDialog();
-            System.Windows.Threading.Dispatcher.Run();
+                var x = _xOffset.ToString(CultureInfo.InvariantCulture);
+                var y = _yOffset.ToString(CultureInfo.InvariantCulture);
+                var scale = _scaleXY.ToString(CultureInfo.InvariantCulture);
+                var angle = _angle.ToString(CultureInfo.InvariantCulture);
+                //см выше(PageNumber)
+                var pageNumber = _pageNumber.ToString(CultureInfo.InvariantCulture);
+                var includeStamp = _includeStamp;
+
+                _model = new GraphicLayerElementSettingsModel(_filePath, x, y, scale, angle, _verticalAlignment, _horizontalAlignment, includeStamp, pageNumber);
+                _model.OnSaveSettings += ReloadSettings;
+
+                //  if (itemName != ServiceGraphicLayerMenu)
+                //      return;
+
+                _settingsView = new GraphicLayerElementSettingsView { DataContext = _model };
+                //не было(возможно ASCON сам убрал в следующей версии)
+                _settingsView.Unloaded += SettingsViewOnUnloaded;
+
+                var activeWindowHandle = GetForegroundWindow();
+                new WindowInteropHelper(_settingsView)
+                {
+                    Owner = activeWindowHandle
+                };
+                _settingsView.ShowDialog();
+                System.Windows.Threading.Dispatcher.Run();
+            }
+
+            else if (itemName == MoveSignatureMenu)
+            {
+                AddGraphicLayer(_context.DataObject);
+            }
+
+            else
+            {
+                return;
+            }
         }
 
         private void ReloadSettings(object sender, EventArgs e)
@@ -154,7 +194,7 @@ namespace Ascon.Pilot.SDK.GraphicLayerSample
             _scaleXY = 1;
             try
             {
-                double.TryParse(Properties.Settings.Default.Scale.Replace(".", dec_separator).Replace(",", dec_separator), out _scaleXY);
+                _scaleXY = double.Parse(Properties.Settings.Default.Scale.Replace(".", dec_separator).Replace(",", dec_separator));
               //  var tmp = Properties.Settings.Default.Scale.Split(',', '.');
               //  double whole;
               //  double.TryParse(tmp[0], out whole);
@@ -167,7 +207,13 @@ namespace Ascon.Pilot.SDK.GraphicLayerSample
 
             double.TryParse(Properties.Settings.Default.Angle, out _angle);
             //см выше(PageNumber)
-            int.TryParse(Properties.Settings.Default.PageNumber, out _pageNumber);
+
+            // fixed zero pagenumber
+            bool success = int.TryParse(Properties.Settings.Default.PageNumber, out _pageNumber);
+            if (success == false)
+            {
+                _pageNumber = 1;
+            }
             Enum.TryParse(Properties.Settings.Default.VerticalAligment, out _verticalAlignment);
             Enum.TryParse(Properties.Settings.Default.HorizontalAligment, out _horizontalAlignment);
         }
@@ -178,6 +224,14 @@ namespace Ascon.Pilot.SDK.GraphicLayerSample
             _settingsView.Unloaded -= SettingsViewOnUnloaded;
             _model.OnSaveSettings -= ReloadSettings;
         }
+
+
+        
+
+
+
+
+        // adding picture to document !!!!!!!
 
         private void SaveToDataBaseRastr(IDataObject dataObject)
         {
@@ -191,6 +245,11 @@ namespace Ascon.Pilot.SDK.GraphicLayerSample
                 fileStream.Read(byteArray, 0, (int)fileStream.Length);
                 var imageStream = new MemoryStream(byteArray);
                 var scale = new Point(_scaleXY, _scaleXY);
+
+
+                var _pageNumber = _xpsViewer.CurrentPageNumber + 1;
+
+
                 //что то нужное
                 var name = GraphicLayerElementConstants.GRAPHIC_LAYER_ELEMENT + ToGuid(_currentPerson.Id); //не было
 

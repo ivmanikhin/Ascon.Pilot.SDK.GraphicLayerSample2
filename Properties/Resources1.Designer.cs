@@ -212,5 +212,14 @@ namespace Ascon.Pilot.SDK.GraphicLayerSample2.Properties {
                 return ResourceManager.GetString("txtMenuItem", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Move signature to another sheet.
+        /// </summary>
+        public static string txtMoveSignatureMenu {
+            get {
+                return ResourceManager.GetString("txtMoveSignatureMenu", resourceCulture);
+            }
+        }
     }
 }
