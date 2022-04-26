@@ -9,57 +9,56 @@ using System.Windows.Interop;
 using System.Xaml;
 using System.Windows.Media;
 using System.Xml.Serialization;
-using Ascon.Pilot.SDK.XpsViewerSample;
+using Ascon.Pilot.SDK;
 using Ascon.Pilot.SDK.Menu;
-using Ascon.Pilot.SDK.CreateObjectSample;
 using Ascon.Pilot.Theme.ColorScheme;
 using Color = System.Windows.Media.Color;
 using Point = System.Windows.Point;
 using System.Threading.Tasks;
-using Ascon.Pilot.SDK.GraphicLayerSample;
-
-
-namespace Ascon.Pilot.SDK.CreateObjectSample
-{
-    public class ObjectLoader : IObserver<IDataObject>
-    {
-        private readonly IObjectsRepository _repository;
-   //     private IDataObject _dataObject;
-        private IDisposable _subscription;
-        private TaskCompletionSource<IDataObject> _tcs;
-        private long _changesetId;
-
-        public ObjectLoader(IObjectsRepository repository)
-        {
-            _repository = repository;
-        }
 
 
 
-        public Task<IDataObject> Load(Guid id, long changesetId = 0)
-        {
-            _changesetId = changesetId;
-            _tcs = new TaskCompletionSource<IDataObject>();
-            _subscription = _repository.SubscribeObjects(new[] { id }).Subscribe(this);
-            return _tcs.Task;
-        }
-
-        public void OnNext(IDataObject value)
-        {
-            if (value.State != DataState.Loaded)
-                return;
-
-            if (value.LastChange() < _changesetId)
-                return;
-
-            _tcs.TrySetResult(value);
-            _subscription.Dispose();
-        }
-
-        public void OnError(Exception error) { }
-        public void OnCompleted() { }
-    }
-}
+//namespace Ascon.Pilot.SDK.CreateObjectSample
+//{
+//    public class ObjectLoader : IObserver<IDataObject>
+//    {
+//        private readonly IObjectsRepository _repository;
+//   //     private IDataObject _dataObject;
+//        private IDisposable _subscription;
+//        private TaskCompletionSource<IDataObject> _tcs;
+//        private long _changesetId;
+//
+//        public ObjectLoader(IObjectsRepository repository)
+//        {
+//            _repository = repository;
+//        }
+//
+//
+//
+//        public Task<IDataObject> Load(Guid id, long changesetId = 0)
+//        {
+//            _changesetId = changesetId;
+//            _tcs = new TaskCompletionSource<IDataObject>();
+//            _subscription = _repository.SubscribeObjects(new[] { id }).Subscribe(this);
+//            return _tcs.Task;
+//        }
+//
+//        public void OnNext(IDataObject value)
+//        {
+//            if (value.State != DataState.Loaded)
+//                return;
+//
+//            if (value.LastChange() < _changesetId)
+//                return;
+//
+//            _tcs.TrySetResult(value);
+//            _subscription.Dispose();
+//        }
+//
+//        public void OnError(Exception error) { }
+//        public void OnCompleted() { }
+//    }
+//}
 
 
 
@@ -72,7 +71,7 @@ namespace Ascon.Pilot.SDK.GraphicLayerSample
     public class GraphicLayerSample : IMenu<MainViewContext>, IHandle<UnloadedEventArgs>, IObserver<INotification>
     {
         //variable for decimal separator
-        private readonly string dec_separator = CultureInfo.CurrentCulture.NumberFormat.NumberDecimalSeparator; 
+        private readonly string dec_separator = CultureInfo.CurrentCulture.NumberFormat.NumberDecimalSeparator;
         private const string ServiceGraphicLayerMenu = "ServiceGraphicLayerMenu";
         // adding MoveSignatureMenu name
         private const string MoveSignatureMenu = "MoveSignatureMenu";
@@ -92,9 +91,9 @@ namespace Ascon.Pilot.SDK.GraphicLayerSample
         private double _scaleXY;
         private double _angle;
         //чтобы можно было на разные страницы ставить
-        private int _pageNumber; 
+        private int _pageNumber;
         private bool _includeStamp;
-        private XpsRenderContext _context;
+        //   private XpsRenderContext _context;
 
 
         [DllImport("user32.dll")]
@@ -112,7 +111,7 @@ namespace Ascon.Pilot.SDK.GraphicLayerSample
             eventAggregator.Subscribe(this);
             _modifier = modifier;
             _repository = repository;
-        //    _context = context;
+            //    _context = context;
             // making xpsViewer
             _xpsViewer = xpsViewer;
             var signatureNotifier = repository.SubscribeNotification(NotificationKind.ObjectSignatureChanged);
@@ -122,7 +121,44 @@ namespace Ascon.Pilot.SDK.GraphicLayerSample
             CheckSettings();
         }
 
-          
+        public class ObjectLoader : IObserver<IDataObject>
+        {
+            private readonly IObjectsRepository _repository;
+       //     private IDataObject _dataObject;
+            private IDisposable _subscription;
+            private TaskCompletionSource<IDataObject> _tcs;
+            private long _changesetId;
+    
+            public ObjectLoader(IObjectsRepository repository)
+            {
+                _repository = repository;
+            }
+    
+    
+    
+            public Task<IDataObject> Load(Guid id, long changesetId = 0)
+            {
+                _changesetId = changesetId;
+                _tcs = new TaskCompletionSource<IDataObject>();
+                _subscription = _repository.SubscribeObjects(new[] { id }).Subscribe(this);
+                return _tcs.Task;
+            }
+    
+            public void OnNext(IDataObject value)
+            {
+                if (value.State != DataState.Loaded)
+                    return;
+    
+                if (value.LastChange() < _changesetId)
+                    return;
+    
+                _tcs.TrySetResult(value);
+                _subscription.Dispose();
+            }
+    
+            public void OnError(Exception error) { }
+            public void OnCompleted() { }
+        }
 
         // adding menu item
         public void Build(IMenuBuilder builder, MainViewContext context)
@@ -131,9 +167,9 @@ namespace Ascon.Pilot.SDK.GraphicLayerSample
             var menuItem = builder.ItemNames.First();
             builder.GetItem(menuItem).AddItem(ServiceGraphicLayerMenu, 0).WithHeader(GraphicLayerSample2.Properties.Resources.txtMenuItem);
             // adding item for moving signature
-            builder.GetItem(menuItem).AddItem(MoveSignatureMenu, 1).WithHeader(GraphicLayerSample2.Properties.Resources.txtMoveSignatureMenu);
+            //   builder.GetItem(menuItem).AddItem(MoveSignatureMenu, 1).WithHeader(GraphicLayerSample2.Properties.Resources.txtMoveSignatureMenu);
         }
-        
+
 
 
         // open dialog on menu item click
@@ -170,7 +206,7 @@ namespace Ascon.Pilot.SDK.GraphicLayerSample
 
             else if (itemName == MoveSignatureMenu)
             {
- //              AddGraphicLayer();
+                //              AddGraphicLayer();
             }
 
             else
@@ -184,10 +220,9 @@ namespace Ascon.Pilot.SDK.GraphicLayerSample
             CheckSettings();
         }
 
-        private void CheckSettings()
+        public void CheckSettings()
         {
-            var path = Properties.Settings.Default.Path;
-            _filePath = path;
+            _filePath = Properties.Settings.Default.Path;
             _includeStamp = Properties.Settings.Default.IncludeStamp;
             double.TryParse(Properties.Settings.Default.X, out _xOffset);
             double.TryParse(Properties.Settings.Default.Y, out _yOffset);
@@ -195,13 +230,13 @@ namespace Ascon.Pilot.SDK.GraphicLayerSample
             try
             {
                 _scaleXY = double.Parse(Properties.Settings.Default.Scale.Replace(".", dec_separator).Replace(",", dec_separator));
-              //  var tmp = Properties.Settings.Default.Scale.Split(',', '.');
-              //  double whole;
-              //  double.TryParse(tmp[0], out whole);
-              //  double fraction = 0;
-              //  if (tmp.Length > 1)
-              //      double.TryParse("0" + CultureInfo.CurrentCulture.NumberFormat.CurrencyDecimalSeparator + tmp[1], out fraction);
-              //  _scaleXY = whole + fraction;
+                //  var tmp = Properties.Settings.Default.Scale.Split(',', '.');
+                //  double whole;
+                //  double.TryParse(tmp[0], out whole);
+                //  double fraction = 0;
+                //  if (tmp.Length > 1)
+                //      double.TryParse("0" + CultureInfo.CurrentCulture.NumberFormat.CurrencyDecimalSeparator + tmp[1], out fraction);
+                //  _scaleXY = whole + fraction;
             }
             catch (Exception) { }
 
@@ -218,14 +253,14 @@ namespace Ascon.Pilot.SDK.GraphicLayerSample
         }
 
         //не было процедуры(возможно ASCON сам убрал в следующей версии)
-        private void SettingsViewOnUnloaded(object sender, RoutedEventArgs e) 
+        private void SettingsViewOnUnloaded(object sender, RoutedEventArgs e)
         {
             _settingsView.Unloaded -= SettingsViewOnUnloaded;
             _model.OnSaveSettings -= ReloadSettings;
         }
 
 
-        
+
 
 
 
@@ -246,7 +281,7 @@ namespace Ascon.Pilot.SDK.GraphicLayerSample
                 var scale = new Point(_scaleXY, _scaleXY);
 
                 //sign current page
-                var _pageNumber = _xpsViewer.CurrentPageNumber + 1;
+               // var _pageNumber = _xpsViewer.CurrentPageNumber + 1;
 
 
                 //что то нужное
@@ -266,31 +301,33 @@ namespace Ascon.Pilot.SDK.GraphicLayerSample
             }
         }
 
-        private void SaveToDataBaseXaml(IDataObject dataObject, string xamlObject, Guid elementId)
-        {
-            var builder = _modifier.Edit(dataObject);
-            var textBlocksStream = new MemoryStream();
-            using (var writer = new StreamWriter(textBlocksStream))
-            {
-                writer.Write(xamlObject);
-                writer.Flush();
+  //      private void SaveToDataBaseXaml(IDataObject dataObject, string xamlObject, Guid elementId)
+  //      {
+  //          var builder = _modifier.Edit(dataObject);
+  //          var textBlocksStream = new MemoryStream();
+  //          using (var writer = new StreamWriter(textBlocksStream))
+  //          {
+  //              writer.Write(xamlObject);
+  //              writer.Flush();
+  //
+  //              var positionId = _currentPerson.MainPosition.Position;
+  //              var name = GraphicLayerElementConstants.GRAPHIC_LAYER_ELEMENT + elementId + "_" + positionId;
+  //              var scale = new Point(_scaleXY, _scaleXY);
+  //
+  //              var element = GraphicLayerElementCreator.Create(_xOffset, _yOffset, scale, _angle, positionId,
+  //                  _verticalAlignment, _horizontalAlignment, GraphicLayerElementConstants.XAML, elementId, _pageNumber/*см выше(PageNumber) был 0*/, true);
+  //              var serializer = new XmlSerializer(typeof(GraphicLayerElement));
+  //              using (var stream = new MemoryStream())
+  //              {
+  //                  serializer.Serialize(stream, element);
+  //                  builder.AddFile(name, stream, DateTime.Now, DateTime.Now, DateTime.Now);
+  //              }
+  //              builder.AddFile(GraphicLayerElementConstants.GRAPHIC_LAYER_ELEMENT_CONTENT + element.ContentId, textBlocksStream, DateTime.Now, DateTime.Now, DateTime.Now);
+  //              _modifier.Apply();
+  //          }
+  //      }
 
-                var positionId = _currentPerson.MainPosition.Position;
-                var name = GraphicLayerElementConstants.GRAPHIC_LAYER_ELEMENT + elementId + "_" + positionId;
-                var scale = new Point(_scaleXY, _scaleXY);
 
-                var element = GraphicLayerElementCreator.Create(_xOffset, _yOffset, scale, _angle, positionId, 
-                    _verticalAlignment, _horizontalAlignment, GraphicLayerElementConstants.XAML, elementId, _pageNumber/*см выше(PageNumber) был 0*/, true);
-                var serializer = new XmlSerializer(typeof(GraphicLayerElement));
-                using (var stream = new MemoryStream())
-                {
-                    serializer.Serialize(stream, element);
-                    builder.AddFile(name, stream, DateTime.Now, DateTime.Now, DateTime.Now);
-                }
-                builder.AddFile(GraphicLayerElementConstants.GRAPHIC_LAYER_ELEMENT_CONTENT + element.ContentId, textBlocksStream, DateTime.Now, DateTime.Now, DateTime.Now);
-                _modifier.Apply();
-            }
-        }
 
         public async void OnNext(INotification value)
         {
@@ -302,26 +339,26 @@ namespace Ascon.Pilot.SDK.GraphicLayerSample
             {
                 var loaderForFirstSign = new ObjectLoader(_repository);
                 var obj = await loaderForFirstSign.Load(value.ObjectId);
-                
+
                 if (obj.Files.Any(f => f.Name.Contains("Signature")))
                     AddGraphicLayer(obj);
-                
+
                 return;
             }
             if (value.ChangeKind == NotificationKind.ObjectFileChanged && _currentPerson.Id == value.UserId)
             {
                 var loader = new ObjectLoader(_repository);
                 var obj = await loader.Load(value.ObjectId);
-                
+
                 if (!obj.Files.Any(f => f.Name.Contains("Signature")))
                     return;
-                    
+
                 AddGraphicLayer(obj);
-                
+
             }
         }
 
-        public static void AddGraphicLayer(IDataObject dataObject)
+        public void AddGraphicLayer(IDataObject dataObject)
         {
             //удаление старых подписей, если есть
             foreach (var file in dataObject.Files) //новое
@@ -337,24 +374,24 @@ namespace Ascon.Pilot.SDK.GraphicLayerSample
             //var facsimileFileName = GraphicLayerElementConstants.GRAPHIC_LAYER_ELEMENT + ToGuid(_currentPerson.Id);
             //старое условие проверявшее, есть ли уже подпись в файле 
             //if (!dataObject.Files.Any(f => f.Name.Equals(facsimileFileName)))
-            var signaturesCount = dataObject.Files.Count(f => f.Name.Contains("Signature"));
-            var xpsFile = dataObject.ActualFileSnapshot.Files.FirstOrDefault(f =>
-            {
-                var extension = Path.GetExtension(f.Name);
-                return extension != null && (extension.Equals(".xps") || extension.Equals(".dwfx"));
-            });
-            var requestsCount = xpsFile?.Signatures.Count;
-            //пока нигде не используется(на будущее)
-            //var currentPersonSignuterCount = xpsFile.Signatures.Count(f => _currentPerson.AllOrgUnits().Contains(f.PositionId) && (f.Sign != null)); //не было
-            if (requestsCount == signaturesCount && _includeStamp)
-            {
-                var stamp1 = GraphicLayerElementCreator.CreateStamp1().ToString();
-                SaveToDataBaseXaml(dataObject, stamp1, Guid.NewGuid());
-                var stamp2 = GraphicLayerElementCreator.CreateStamp2().ToString();
-                SaveToDataBaseXaml(dataObject, stamp2, Guid.NewGuid());
-            }
-            //теперь вместо передачи facsimileFileName 
-            //в SaveToDataBaseRastr создается name
+  //          var signaturesCount = dataObject.Files.Count(f => f.Name.Contains("Signature"));
+  //          var xpsFile = dataObject.ActualFileSnapshot.Files.FirstOrDefault(f =>
+  //          {
+  //              var extension = Path.GetExtension(f.Name);
+  //              return extension != null && (extension.Equals(".xps") || extension.Equals(".dwfx"));
+  //          });
+  //          var requestsCount = xpsFile?.Signatures.Count;
+  //          //пока нигде не используется(на будущее)
+  //          //var currentPersonSignuterCount = xpsFile.Signatures.Count(f => _currentPerson.AllOrgUnits().Contains(f.PositionId) && (f.Sign != null)); //не было
+  //          if (requestsCount == signaturesCount && _includeStamp)
+  //          {
+  //              var stamp1 = GraphicLayerElementCreator.CreateStamp1().ToString();
+  //              SaveToDataBaseXaml(dataObject, stamp1, Guid.NewGuid());
+  //              var stamp2 = GraphicLayerElementCreator.CreateStamp2().ToString();
+  //              SaveToDataBaseXaml(dataObject, stamp2, Guid.NewGuid());
+  //          }
+  //          //теперь вместо передачи facsimileFileName 
+  //          //в SaveToDataBaseRastr создается name
             SaveToDataBaseRastr(dataObject/*было dataObject, facsimileFileName*/);
         }
 
@@ -366,7 +403,7 @@ namespace Ascon.Pilot.SDK.GraphicLayerSample
         }
 
         //изменение процедуры(возможно ASCON сам в следующей версии)
-        public void Handle(UnloadedEventArgs message) { } 
+        public void Handle(UnloadedEventArgs message) { }
         //было
         /*public void Handle(UnloadedEventArgs message)
         {
@@ -375,39 +412,146 @@ namespace Ascon.Pilot.SDK.GraphicLayerSample
         public void OnError(Exception error) { }
         public void OnCompleted() { }
     }
-}
 
 
-namespace Ascon.Pilot.SDK.XpsViewerSample
-{
+
     [Export(typeof(IMenu<XpsRenderClickPointContext>))]
     public class XpsRenderContextMenuSample : IMenu<XpsRenderClickPointContext>
     {
+        private readonly string dec_separator = CultureInfo.CurrentCulture.NumberFormat.NumberDecimalSeparator;
         private readonly IObjectModifier _modifier;
         private readonly IPerson _currentPerson;
-        private const string MoveSignatureMenu = "MoveSignatureMenu";
+        private readonly IXpsViewer _xpsViewer;
+        private string _filePath = string.Empty;
+        private double _xOffset;
+        private double _yOffset;
+        private double _scaleXY;
+        private double _angle;
+        //чтобы можно было на разные страницы ставить
+        private int _pageNumber;
+  //      private bool _includeStamp;
+        private VerticalAlignment _verticalAlignment;
+        private HorizontalAlignment _horizontalAlignment;
+
+
+        // MY CODE HERE START
+        private IDataObject _dataObject;
+        // MY CODE HERE END
+
+        private const string MoveSignatureMenuItem = "MoveSignatureMenuItem";
+        private const string AddSignatureMenuItem = "AddSignatureMenuItem";
 
         [ImportingConstructor]
-        public XpsRenderContextMenuSample(IObjectModifier modifier, IObjectsRepository repository)
+        public XpsRenderContextMenuSample(IObjectModifier modifier, IObjectsRepository repository, IXpsViewer xpsViewer)
         {
             _modifier = modifier;
             _currentPerson = repository.GetCurrentPerson();
+            _xpsViewer = xpsViewer;
         }
 
         public void Build(IMenuBuilder builder, XpsRenderClickPointContext context)
         {
             var items = builder.ItemNames.ToList();
-            var position = items.Contains("miAddGraphicsLine") ? items.IndexOf("miAddGraphicsLine") : items.Count;
-            builder.AddItem(MoveSignatureMenu, position + 1)
-                   .WithHeader(GraphicLayerSample2.Properties.Resources.txtMoveSignatureMenu)
-                   .WithIsEnabled(context.SelectedVersion == context.DataObject.ActualFileSnapshot.Created);
+            //            var position = items.Contains("miAddGraphicsLine") ? items.IndexOf("miAddGraphicsLine") : items.Count;
+            builder.AddItem(MoveSignatureMenuItem, 0)
+                   .WithHeader(GraphicLayerSample2.Properties.Resources.MoveSignatureMenuItem);
+            builder.AddItem(AddSignatureMenuItem, 0)
+                   .WithHeader(GraphicLayerSample2.Properties.Resources.AddSignatureMenuItem);
+            //.WithIsEnabled(/* FOR A WHILE */true);
         }
 
         public void OnMenuItemClick(string name, XpsRenderClickPointContext context)
         {
-            if (name == MoveSignatureMenu)
+            if (name == MoveSignatureMenuItem)
             {
-                Ascon.Pilot.SDK.GraphicLayerSample.GraphicLayerSample.AddGraphicLayer(context.DataObject);
+                // MY CODE HERE START
+                _dataObject = context.DataObject;
+                // MY CODE HERE END
+                CheckSettings();
+                SaveToDataBaseRastr(_dataObject);
+            }
+
+            else if (name == AddSignatureMenuItem)
+            {
+                _dataObject = context.DataObject;
+            }
+        }
+
+        private void CheckSettings()
+        {
+            _filePath = Properties.Settings.Default.Path;
+ //           _includeStamp = Properties.Settings.Default.IncludeStamp;
+            double.TryParse(Properties.Settings.Default.X, out _xOffset);
+            double.TryParse(Properties.Settings.Default.Y, out _yOffset);
+            _scaleXY = 1;
+            try
+            {
+                _scaleXY = double.Parse(Properties.Settings.Default.Scale.Replace(".", dec_separator).Replace(",", dec_separator));
+
+            }
+            catch (Exception) { }
+
+            double.TryParse(Properties.Settings.Default.Angle, out _angle);
+            //см выше(PageNumber)
+
+            // fixed zero pagenumber
+            bool success = int.TryParse(Properties.Settings.Default.PageNumber, out _pageNumber);
+            if (success == false)
+                _pageNumber = 1;
+
+            Enum.TryParse(Properties.Settings.Default.VerticalAligment, out _verticalAlignment);
+            Enum.TryParse(Properties.Settings.Default.HorizontalAligment, out _horizontalAlignment);
+        }
+
+
+        public void MoveSignatureToCurrentPage(IDataObject dataObject)
+        {
+
+            //удаление старых подписей, если есть
+            foreach (var file in dataObject.Files) //новое
+            {
+                if (file.Name.Equals(GraphicLayerElementConstants.GRAPHIC_LAYER_ELEMENT + GraphicLayerSample.ToGuid(_currentPerson.Id)))
+                {
+                    var builder = _modifier.Edit(dataObject);
+                    //builder.RemoveFile(file.Id);
+                }
+            }
+
+            SaveToDataBaseRastr(dataObject);
+        }
+
+
+        private void SaveToDataBaseRastr(IDataObject dataObject)
+        {
+            if (string.IsNullOrEmpty(_filePath))
+                return;
+            var builder = _modifier.Edit(dataObject);
+            using (var fileStream = File.Open(_filePath, FileMode.Open, FileAccess.ReadWrite))
+            {
+                var positionId = _currentPerson.MainPosition.Position;
+                var byteArray = new byte[fileStream.Length];
+                fileStream.Read(byteArray, 0, (int)fileStream.Length);
+                var imageStream = new MemoryStream(byteArray);
+                var scale = new Point(_scaleXY, _scaleXY);
+
+                //sign current page
+                _pageNumber = _xpsViewer.CurrentPageNumber + 1;
+
+
+                //что то нужное
+                var name = GraphicLayerElementConstants.GRAPHIC_LAYER_ELEMENT + GraphicLayerSample.ToGuid(_currentPerson.Id); //не было
+
+                var element = GraphicLayerElementCreator.Create(_xOffset, _yOffset, scale, _angle, positionId, _verticalAlignment,
+                    _horizontalAlignment, GraphicLayerElementConstants.BITMAP, GraphicLayerSample.ToGuid(_currentPerson.Id), _pageNumber /* см выше(PageNumber) был 0*/, true);
+                var serializer = new XmlSerializer(typeof(GraphicLayerElement));
+                using (var stream = new MemoryStream())
+                {
+                    serializer.Serialize(stream, element);
+                    //что то нужное 
+                    builder.AddFile(name/*вместо было facsimileFileName*/, stream, DateTime.Now, DateTime.Now, DateTime.Now);
+                    builder.AddFile(GraphicLayerElementConstants.GRAPHIC_LAYER_ELEMENT_CONTENT + element.ContentId, imageStream, DateTime.Now, DateTime.Now, DateTime.Now);
+                }
+                _modifier.Apply();
             }
         }
 
