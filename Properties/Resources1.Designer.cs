@@ -61,15 +61,6 @@ namespace Ascon.Pilot.SDK.GraphicLayerSample2.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Add signature to current list.
-        /// </summary>
-        public static string AddSignatureMenuItem {
-            get {
-                return ResourceManager.GetString("AddSignatureMenuItem", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Add stamp.
         /// </summary>
         public static string AddStamp {
@@ -151,7 +142,7 @@ namespace Ascon.Pilot.SDK.GraphicLayerSample2.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Move signature to another sheet.
+        ///   Looks up a localized string similar to Move signature here.
         /// </summary>
         public static string MoveSignatureMenuItem {
             get {
@@ -192,6 +183,15 @@ namespace Ascon.Pilot.SDK.GraphicLayerSample2.Properties {
         public static string Path {
             get {
                 return ResourceManager.GetString("Path", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Move signature here and rotate.
+        /// </summary>
+        public static string RotateSignatureMenuItem {
+            get {
+                return ResourceManager.GetString("RotateSignatureMenuItem", resourceCulture);
             }
         }
         

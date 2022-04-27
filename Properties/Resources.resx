@@ -169,9 +169,9 @@
     <value>Page Number</value>
   </data>
   <data name="MoveSignatureMenuItem" xml:space="preserve">
-    <value>Move signature to another sheet</value>
+    <value>Move signature here</value>
   </data>
-  <data name="AddSignatureMenuItem" xml:space="preserve">
-    <value>Add signature to current list</value>
+  <data name="RotateSignatureMenuItem" xml:space="preserve">
+    <value>Move signature here and rotate</value>
   </data>
 </root>

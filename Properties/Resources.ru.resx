@@ -117,8 +117,8 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="AddSignatureMenuItem" xml:space="preserve">
-    <value>Добавить подпись на этот лист</value>
+  <data name="RotateSignatureMenuItem" xml:space="preserve">
+    <value>Перенести подпись сюда и повернуть</value>
   </data>
   <data name="AddStamp" xml:space="preserve">
     <value>Добавить штамп после полного согласования</value>
@@ -148,7 +148,7 @@
     <value>Привязка к углу страницы</value>
   </data>
   <data name="MoveSignatureMenuItem" xml:space="preserve">
-    <value>Перенести подпись на этот лист</value>
+    <value>Перенести подпись сюда</value>
   </data>
   <data name="OffsetX" xml:space="preserve">
     <value>X</value>

@@ -6,61 +6,15 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Interop;
-using System.Xaml;
+//using System.Xaml;
 using System.Windows.Media;
 using System.Xml.Serialization;
-using Ascon.Pilot.SDK;
+//using Ascon.Pilot.SDK;
 using Ascon.Pilot.SDK.Menu;
 using Ascon.Pilot.Theme.ColorScheme;
 using Color = System.Windows.Media.Color;
 using Point = System.Windows.Point;
 using System.Threading.Tasks;
-
-
-
-//namespace Ascon.Pilot.SDK.CreateObjectSample
-//{
-//    public class ObjectLoader : IObserver<IDataObject>
-//    {
-//        private readonly IObjectsRepository _repository;
-//   //     private IDataObject _dataObject;
-//        private IDisposable _subscription;
-//        private TaskCompletionSource<IDataObject> _tcs;
-//        private long _changesetId;
-//
-//        public ObjectLoader(IObjectsRepository repository)
-//        {
-//            _repository = repository;
-//        }
-//
-//
-//
-//        public Task<IDataObject> Load(Guid id, long changesetId = 0)
-//        {
-//            _changesetId = changesetId;
-//            _tcs = new TaskCompletionSource<IDataObject>();
-//            _subscription = _repository.SubscribeObjects(new[] { id }).Subscribe(this);
-//            return _tcs.Task;
-//        }
-//
-//        public void OnNext(IDataObject value)
-//        {
-//            if (value.State != DataState.Loaded)
-//                return;
-//
-//            if (value.LastChange() < _changesetId)
-//                return;
-//
-//            _tcs.TrySetResult(value);
-//            _subscription.Dispose();
-//        }
-//
-//        public void OnError(Exception error) { }
-//        public void OnCompleted() { }
-//    }
-//}
-
-
 
 
 
@@ -77,8 +31,6 @@ namespace Ascon.Pilot.SDK.GraphicLayerSample
         private const string MoveSignatureMenu = "MoveSignatureMenu";
         private readonly IObjectModifier _modifier;
         private readonly IObjectsRepository _repository;
-        // adding xpsViewer to get current page number
-        private readonly IXpsViewer _xpsViewer;
         private IPerson _currentPerson;
         private GraphicLayerElementSettingsView _settingsView;
         private GraphicLayerElementSettingsModel _model;
@@ -100,7 +52,7 @@ namespace Ascon.Pilot.SDK.GraphicLayerSample
         public static extern IntPtr GetForegroundWindow();
 
         [ImportingConstructor]
-        public GraphicLayerSample(IEventAggregator eventAggregator, IObjectModifier modifier, IObjectsRepository repository, IPilotDialogService dialogService, IXpsViewer xpsViewer/*, XpsRenderContext context*/)
+        public GraphicLayerSample(IEventAggregator eventAggregator, IObjectModifier modifier, IObjectsRepository repository, IPilotDialogService dialogService/*, XpsRenderContext context*/)
         {
             var convertFromString = ColorConverter.ConvertFromString(dialogService.AccentColor);
             if (convertFromString != null)
@@ -113,7 +65,6 @@ namespace Ascon.Pilot.SDK.GraphicLayerSample
             _repository = repository;
             //    _context = context;
             // making xpsViewer
-            _xpsViewer = xpsViewer;
             var signatureNotifier = repository.SubscribeNotification(NotificationKind.ObjectSignatureChanged);
             var fileNotifier = repository.SubscribeNotification(NotificationKind.ObjectFileChanged);
             signatureNotifier.Subscribe(this);
@@ -280,10 +231,6 @@ namespace Ascon.Pilot.SDK.GraphicLayerSample
                 var imageStream = new MemoryStream(byteArray);
                 var scale = new Point(_scaleXY, _scaleXY);
 
-                //sign current page
-               // var _pageNumber = _xpsViewer.CurrentPageNumber + 1;
-
-
                 //что то нужное
                 var name = GraphicLayerElementConstants.GRAPHIC_LAYER_ELEMENT + ToGuid(_currentPerson.Id); //не было
 
@@ -366,7 +313,7 @@ namespace Ascon.Pilot.SDK.GraphicLayerSample
                 if (file.Name.Equals(GraphicLayerElementConstants.GRAPHIC_LAYER_ELEMENT + ToGuid(_currentPerson.Id)))
                 {
                     var builder = _modifier.Edit(dataObject);
-                    //builder.RemoveFile(file.Id);
+                    builder.RemoveFile(file.Id);
                 }
             }
             //уже не нужно facsimileFileName передавать в SaveToDataBaseRastr, 
@@ -421,59 +368,65 @@ namespace Ascon.Pilot.SDK.GraphicLayerSample
         private readonly string dec_separator = CultureInfo.CurrentCulture.NumberFormat.NumberDecimalSeparator;
         private readonly IObjectModifier _modifier;
         private readonly IPerson _currentPerson;
-        private readonly IXpsViewer _xpsViewer;
         private string _filePath = string.Empty;
         private double _xOffset;
         private double _yOffset;
         private double _scaleXY;
         private double _angle;
-        //чтобы можно было на разные страницы ставить
         private int _pageNumber;
-  //      private bool _includeStamp;
         private VerticalAlignment _verticalAlignment;
         private HorizontalAlignment _horizontalAlignment;
-
-
-        // MY CODE HERE START
+        public bool isSigned = false;
         private IDataObject _dataObject;
-        // MY CODE HERE END
+
 
         private const string MoveSignatureMenuItem = "MoveSignatureMenuItem";
-        private const string AddSignatureMenuItem = "AddSignatureMenuItem";
+        private const string RotateSignatureMenuItem = "RotateSignatureMenuItem";
 
         [ImportingConstructor]
-        public XpsRenderContextMenuSample(IObjectModifier modifier, IObjectsRepository repository, IXpsViewer xpsViewer)
+        public XpsRenderContextMenuSample(IObjectModifier modifier, IObjectsRepository repository)
         {
             _modifier = modifier;
             _currentPerson = repository.GetCurrentPerson();
-            _xpsViewer = xpsViewer;
         }
 
         public void Build(IMenuBuilder builder, XpsRenderClickPointContext context)
         {
-            var items = builder.ItemNames.ToList();
-            //            var position = items.Contains("miAddGraphicsLine") ? items.IndexOf("miAddGraphicsLine") : items.Count;
+            isSigned = context.DataObject.Files.Any(file => file.Name.Equals(GraphicLayerElementConstants.GRAPHIC_LAYER_ELEMENT + GraphicLayerSample.ToGuid(_currentPerson.Id)));
+            //foreach (var file in context.DataObject.Files) 
+            //{
+            //    if (file.Name.Equals(GraphicLayerElementConstants.GRAPHIC_LAYER_ELEMENT + GraphicLayerSample.ToGuid(_currentPerson.Id)))
+            //        isSigned = true;
+            //}
             builder.AddItem(MoveSignatureMenuItem, 0)
-                   .WithHeader(GraphicLayerSample2.Properties.Resources.MoveSignatureMenuItem);
-            builder.AddItem(AddSignatureMenuItem, 0)
-                   .WithHeader(GraphicLayerSample2.Properties.Resources.AddSignatureMenuItem);
-            //.WithIsEnabled(/* FOR A WHILE */true);
+                   .WithHeader(GraphicLayerSample2.Properties.Resources.MoveSignatureMenuItem)
+                   .WithIsEnabled(isSigned);
+            builder.AddItem(RotateSignatureMenuItem, 0)
+                   .WithHeader(GraphicLayerSample2.Properties.Resources.RotateSignatureMenuItem)
+                   .WithIsEnabled(isSigned);
         }
 
         public void OnMenuItemClick(string name, XpsRenderClickPointContext context)
         {
             if (name == MoveSignatureMenuItem)
             {
-                // MY CODE HERE START
                 _dataObject = context.DataObject;
-                // MY CODE HERE END
+                _pageNumber = context.PageNumber + 1;
                 CheckSettings();
-                SaveToDataBaseRastr(_dataObject);
+                _xOffset = (context.ClickPoint.X - 10 / _scaleXY) *25.4 / 96;
+                _yOffset = (context.ClickPoint.Y - 4 / _scaleXY) *25.4 / 96;
+                MoveSignatureToCurrentPage(_dataObject);
             }
 
-            else if (name == AddSignatureMenuItem)
+            else if (name == RotateSignatureMenuItem)
             {
                 _dataObject = context.DataObject;
+                _pageNumber = context.PageNumber + 1;
+                CheckSettings();
+                _xOffset = (context.ClickPoint.X - 4 / _scaleXY) *25.4 / 96;
+                _yOffset = (context.ClickPoint.Y + 10 / _scaleXY) *25.4 / 96;
+                _angle = 270;
+                MoveSignatureToCurrentPage(_dataObject);
             }
         }
 
@@ -481,13 +434,12 @@ namespace Ascon.Pilot.SDK.GraphicLayerSample
         {
             _filePath = Properties.Settings.Default.Path;
  //           _includeStamp = Properties.Settings.Default.IncludeStamp;
-            double.TryParse(Properties.Settings.Default.X, out _xOffset);
-            double.TryParse(Properties.Settings.Default.Y, out _yOffset);
+      //      double.TryParse(Properties.Settings.Default.X, out _xOffset);
+      //      double.TryParse(Properties.Settings.Default.Y, out _yOffset);
             _scaleXY = 1;
             try
             {
                 _scaleXY = double.Parse(Properties.Settings.Default.Scale.Replace(".", dec_separator).Replace(",", dec_separator));
-
             }
             catch (Exception) { }
 
@@ -495,12 +447,12 @@ namespace Ascon.Pilot.SDK.GraphicLayerSample
             //см выше(PageNumber)
 
             // fixed zero pagenumber
-            bool success = int.TryParse(Properties.Settings.Default.PageNumber, out _pageNumber);
-            if (success == false)
-                _pageNumber = 1;
-
-            Enum.TryParse(Properties.Settings.Default.VerticalAligment, out _verticalAlignment);
-            Enum.TryParse(Properties.Settings.Default.HorizontalAligment, out _horizontalAlignment);
+      //      bool success = int.TryParse(Properties.Settings.Default.PageNumber, out _pageNumber);
+      //      if (success == false)
+      //          _pageNumber = 1;
+      //
+      //      Enum.TryParse(Properties.Settings.Default.VerticalAligment, out _verticalAlignment);
+      //      Enum.TryParse(Properties.Settings.Default.HorizontalAligment, out _horizontalAlignment);
         }
 
 
@@ -513,7 +465,7 @@ namespace Ascon.Pilot.SDK.GraphicLayerSample
                 if (file.Name.Equals(GraphicLayerElementConstants.GRAPHIC_LAYER_ELEMENT + GraphicLayerSample.ToGuid(_currentPerson.Id)))
                 {
                     var builder = _modifier.Edit(dataObject);
-                    //builder.RemoveFile(file.Id);
+                    builder.RemoveFile(file.Id);
                 }
             }
 
@@ -535,8 +487,10 @@ namespace Ascon.Pilot.SDK.GraphicLayerSample
                 var scale = new Point(_scaleXY, _scaleXY);
 
                 //sign current page
-                _pageNumber = _xpsViewer.CurrentPageNumber + 1;
+           //     _pageNumber = _xpsViewer.CurrentPageNumber + 1;
 
+   //             _xOffset = (_xOffset - 10 / _scaleXY) * 25.4 / 96;
+   //             _yOffset = (_yOffset - 4 / _scaleXY) * 25.4 / 96;
 
                 //что то нужное
                 var name = GraphicLayerElementConstants.GRAPHIC_LAYER_ELEMENT + GraphicLayerSample.ToGuid(_currentPerson.Id); //не было
@@ -556,4 +510,5 @@ namespace Ascon.Pilot.SDK.GraphicLayerSample
         }
 
     }
+
 }
